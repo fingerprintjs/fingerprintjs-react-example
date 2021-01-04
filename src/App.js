@@ -42,7 +42,9 @@ export default function App() {
             })
             .then((data) => {
                 console.log(data.visits);
-                setResponseSummary(`Received history of ${data.visits.length} visits:`);
+                setResponseSummary(
+                    `Received history of ${data.visits.length} visits:`
+                );
                 data = JSON.stringify(data.visits, null, 4);
                 setServerData(data);
             });
@@ -66,7 +68,7 @@ export default function App() {
                         cursor: "pointer",
                     }}
                 >
-                    Get data
+                    Get Visit History
                 </button>
                 <h3>{responseSummary}</h3>
                 <pre

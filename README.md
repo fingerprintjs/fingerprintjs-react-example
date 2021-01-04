@@ -1,70 +1,98 @@
-# Getting Started with Create React App
+# FingerprintJS Pro working in create-react-app
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Using create-react-app:
 
-## Available Scripts
+First, create an app with the following command:
 
-In the project directory, you can run:
+```
+$ npx create-react-app my-project
+```
 
-### `yarn start`
+After the app is created, enter the directory:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+```
+$ cd my-project
+```
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+and host a server locally:
 
-### `yarn test`
+```
+$ yarn start
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+If all goes well, you should be notified in terminal that your app is being hosted on port 3000.
+Any changes you make to the source files will automatically update.
 
-### `yarn build`
+## Editing files
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Inside the "src" folder, you will find a file called "App.js". This is the only file I have changed in order to use FPJS in the example.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. First, you will want to install the npm package for FingerprintJS. Go to the console and run:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+$ npm install @fingerprintjs/fingerprintjs-pro --save
+```
 
-### `yarn eject`
+You can now import the package into the top of the App.js file:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```javascript
+import logo from "./logo.svg";
+import "./App.css";
+import FingerprintJS from "@fingerprintjs/fingerprintjs-pro";
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+2. Store Tokens.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+I have directly inserted the tokens as variables. I am able to do so by whitelisting the domains in the customer dashboard, but you may want to keep these safe in a .env file instead so that these sensitive tokens arent revealed in your codebase. For the server API, it is recommended to use basic auth in request headers instead of using a token. You can read more about it <a href="https://dev.fingerprintjs.com/docs/server-api#authentication" target="_blank"> here</a>.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+3. Getting a visitor ID.
 
-## Learn More
+In order to get a visitor ID, use the FingerprintJS object:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```javascript
+useEffect(() => {
+    FingerprintJS.load({
+        token: BROWSERAPIKEY,
+    })
+        .then((fp) => fp.get())
+        .then((result) => {
+            setVisitorId(result.visitorId);
+        });
+}, []);
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+For this example, the visitorId is asked for on page load using the `useEffect` hook in React, however, you can configure this api call to be made in any context that suits your needs.In the clip above, you can see reference to my token with the "BROWSERAPIKEY" variable.
+You can also see a function that I have created with the useState hook: "setVisitorId". This function will set the variable "visitorId".
 
-### Code Splitting
+4. Querying the server API for visitor history:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+The following function will query the server API. Please note that if your account is registered to the EU region, your base URL should be: https://eu.api.fpjs.io.
 
-### Analyzing the Bundle Size
+In the query below the visitorID and token is passed, as well as a "limitTo" variable, which will limit the amount of responses returned by the API. You can learn more about the query options <a href="https://dev.fingerprintjs.com/docs/server-api" target="_blank"> here</a>
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```javascript
+const callServerAPI = () => {
+    fetch(
+        `https://api.fpjs.io/visitors/${visitorId}?limit=${limitTo}&token=${SERVERAPIKEY}`
+    )
+        .then((response) => {
+            return response.json();
+        })
+        .then((data) => {
+            console.log(data.visits);
+            setResponseSummary(
+                `Received history of ${data.visits.length} visits:`
+            );
+            data = JSON.stringify(data.visits, null, 4);
+            setServerData(data);
+        });
+};
+```
 
-### Making a Progressive Web App
+Like the "setVisitorId" function, the "setResponseSummary" and "setServerData" functions are made from the "useState" hook in order to change the state of those variables in React. This function is called on the button click.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Further Steps
 
-### Advanced Configuration
+If you would like to know more, please visit our [Documentation](https://dev.fingerprintjs.com/docs) to see best practices and guides on how to implement them.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+If you have a question, please contact us at [support@fingerprintjs.com](support@fingerprintjs.com).
