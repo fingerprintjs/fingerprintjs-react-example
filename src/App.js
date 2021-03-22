@@ -7,35 +7,35 @@ import FingerprintJS from "@fingerprintjs/fingerprintjs-pro";
 // You can also simply whitelist the addresses from which you will be making the calls in your user dashboard
 // For the server API key, we reccommend setting up an Auth Header instead, you can read more in the docs:
 // https://dev.fingerprintjs.com/docs/server-api
-const BROWSERAPIKEY = "P7vQXeD8G1VlmDAwwFir";
-const SERVERAPIKEY = "9MLmWT6ziZqePf9JrDZP";
-
-// This will limit the amount of visits the api queries
-const limitTo = 10;
+const BROWSER_API_KEY = "k6mBs3JggSu0q48OS7yz";
+const SERVER_API_KEY = "iJhQgk9AG5w91l0bmSH1";
 
 export default function App() {
+    // Keeping track of if the visitorId has loaded yet
+    const [isLoading, setIsLoading] = useState(true);
     // Visitor ID is the unique string ID used to identify a visitor of the site.
-    const [visitorId, setVisitorId] = useState("Waiting...");
-    // Server Data is the returned data from the SERVER API call.
-    const [serverData, setServerData] = useState("");
+    const [visitorId, setVisitorId] = useState("");
+    // vistorHistory is the returned data from the SERVER API call.
+    const [visitorHistory, setVisitorHistory] = useState("");
     // This is just to display the response title (underneath the button)
     const [responseSummary, setResponseSummary] = useState("");
 
-    // This will get the Visitor ID on page load
+    // This will get the Visitor ID on component mount
     useEffect(() => {
         FingerprintJS.load({
-            token: BROWSERAPIKEY,
+            token: BROWSER_API_KEY,
         })
             .then((fp) => fp.get())
             .then((result) => {
                 setVisitorId(result.visitorId);
+                setIsLoading(false);
             });
     }, []);
 
     // this will query the server API for the visitor history.
-    const callServerAPI = () => {
+    const getVisits = (limitTo) => {
         fetch(
-            `https://api.fpjs.io/visitors/${visitorId}?limit=${limitTo}&token=${SERVERAPIKEY}`
+            `https://api.fpjs.io/visitors/${visitorId}?limit=${limitTo}&token=${SERVER_API_KEY}`
         )
             .then((response) => {
                 return response.json();
@@ -46,7 +46,7 @@ export default function App() {
                     `Received history of ${data.visits.length} visits:`
                 );
                 data = JSON.stringify(data.visits, null, 4);
-                setServerData(data);
+                setVisitorHistory(data);
             });
     };
 
@@ -54,9 +54,9 @@ export default function App() {
         <div className="App">
             <header className="App-header">
                 <img src={logo} className="App-logo" alt="logo" />
-                <p>Your visitorId is: {visitorId}</p>
+                <p>Your visitorId is: {isLoading ? "Loading..." : visitorId}</p>
                 <button
-                    onClick={callServerAPI}
+                    onClick={() => getVisits(10)}
                     style={{
                         backgroundColor: "white",
                         padding: "5px 10px",
@@ -79,7 +79,7 @@ export default function App() {
                         fontSize: 14,
                     }}
                 >
-                    {serverData}
+                    {visitorHistory}
                 </pre>
             </header>
         </div>

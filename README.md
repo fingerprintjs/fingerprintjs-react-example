@@ -52,28 +52,29 @@ In order to get a visitor ID, use the FingerprintJS object:
 ```javascript
 useEffect(() => {
     FingerprintJS.load({
-        token: BROWSERAPIKEY,
+        token: BROWSER_API_KEY,
     })
         .then((fp) => fp.get())
         .then((result) => {
             setVisitorId(result.visitorId);
+            setIsLoading(false);
         });
 }, []);
 ```
 
-For this example, the visitorId is asked for on page load using the `useEffect` hook in React, however, you can configure this api call to be made in any context that suits your needs.In the clip above, you can see reference to my token with the "BROWSERAPIKEY" variable.
+For this example, the visitorId is asked for on page load using the `useEffect` hook in React, however, you can configure this api call to be made in any context that suits your needs.In the clip above, you can see reference to my token with the "BROWSER_API_KEY" variable.
 You can also see a function that I have created with the useState hook: "setVisitorId". This function will set the variable "visitorId".
 
 4. Querying the server API for visitor history:
 
 The following function will query the server API. Please note that if your account is registered to the EU region, your base URL should be: https://eu.api.fpjs.io.
 
-In the query below the visitorID and token is passed, as well as a "limitTo" variable, which will limit the amount of responses returned by the API. You can learn more about the query options <a href="https://dev.fingerprintjs.com/docs/server-api" target="_blank"> here</a>
+In the query below the visitorID and token is passed, as well as a "limitTo" argument, which will limit the amount of responses returned by the API. You can learn more about the query options <a href="https://dev.fingerprintjs.com/docs/server-api" target="_blank"> here</a>
 
 ```javascript
-const callServerAPI = () => {
+const getVisits = (limitTo) => {
     fetch(
-        `https://api.fpjs.io/visitors/${visitorId}?limit=${limitTo}&token=${SERVERAPIKEY}`
+        `https://api.fpjs.io/visitors/${visitorId}?limit=${limitTo}&token=${SERVER_API_KEY}`
     )
         .then((response) => {
             return response.json();
@@ -84,12 +85,12 @@ const callServerAPI = () => {
                 `Received history of ${data.visits.length} visits:`
             );
             data = JSON.stringify(data.visits, null, 4);
-            setServerData(data);
+            setVisitorHistory(data);
         });
 };
 ```
 
-Like the "setVisitorId" function, the "setResponseSummary" and "setServerData" functions are made from the "useState" hook in order to change the state of those variables in React. This function is called on the button click.
+Like the "setVisitorId" function, the "setResponseSummary" and "setVisitorHistory" functions are made from the "useState" hook in order to change the state of those variables in React. This function is called when the button is clicked.
 
 ## Further Steps
 
