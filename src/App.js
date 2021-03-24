@@ -75,7 +75,7 @@ export default function App() {
                         fontSize: 14,
                     }}
                 >
-                    {visitorHistory
+                    {visitorHistory.visits
                         ? JSON.stringify(visitorHistory.visits, null, 4)
                         : null}
                 </pre>
