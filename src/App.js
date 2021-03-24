@@ -16,9 +16,7 @@ export default function App() {
     // Visitor ID is the unique string ID used to identify a visitor of the site.
     const [visitorId, setVisitorId] = useState("");
     // vistorHistory is the returned data from the SERVER API call.
-    const [visitorHistory, setVisitorHistory] = useState("");
-    // This is just to display the response title (underneath the button)
-    const [responseSummary, setResponseSummary] = useState("");
+    const [visitorHistory, setVisitorHistory] = useState({});
 
     // This will get the Visitor ID on component mount
     useEffect(() => {
@@ -33,21 +31,12 @@ export default function App() {
     }, []);
 
     // this will query the server API for the visitor history.
-    const getVisits = (limitTo) => {
-        fetch(
+    const getVisits = async (limitTo) => {
+        return fetch(
             `https://api.fpjs.io/visitors/${visitorId}?limit=${limitTo}&token=${SERVER_API_KEY}`
-        )
-            .then((response) => {
-                return response.json();
-            })
-            .then((data) => {
-                console.log(data.visits);
-                setResponseSummary(
-                    `Received history of ${data.visits.length} visits:`
-                );
-                data = JSON.stringify(data.visits, null, 4);
-                setVisitorHistory(data);
-            });
+        ).then((response) => {
+            return response.json();
+        });
     };
 
     return (
@@ -56,7 +45,10 @@ export default function App() {
                 <img src={logo} className="App-logo" alt="logo" />
                 <p>Your visitorId is: {isLoading ? "Loading..." : visitorId}</p>
                 <button
-                    onClick={() => getVisits(10)}
+                    onClick={async () => {
+                        const history = await getVisits(10);
+                        setVisitorHistory(history);
+                    }}
                     style={{
                         backgroundColor: "white",
                         padding: "5px 10px",
@@ -70,7 +62,11 @@ export default function App() {
                 >
                     Get Visit History
                 </button>
-                <h3>{responseSummary}</h3>
+                <h3>
+                    {visitorHistory.visits
+                        ? `Received history of ${visitorHistory.visits.length} visits:`
+                        : null}
+                </h3>
                 <pre
                     style={{
                         fontFamily: "inherit",
@@ -79,7 +75,9 @@ export default function App() {
                         fontSize: 14,
                     }}
                 >
-                    {visitorHistory}
+                    {visitorHistory
+                        ? JSON.stringify(visitorHistory.visits, null, 4)
+                        : null}
                 </pre>
             </header>
         </div>
