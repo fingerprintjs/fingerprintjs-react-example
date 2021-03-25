@@ -16,7 +16,7 @@ export default function App() {
     // Visitor ID is the unique string ID used to identify a visitor of the site.
     const [visitorId, setVisitorId] = useState("");
     // vistorHistory is the returned data from the SERVER API call.
-    const [visitorHistory, setVisitorHistory] = useState({});
+    const [visitorHistory, setVisitorHistory] = useState();
 
     // This will get the Visitor ID on component mount
     useEffect(() => {
@@ -31,7 +31,8 @@ export default function App() {
     }, []);
 
     // this will query the server API for the visitor history.
-    const getVisits = async (limitTo) => {
+    function getVisits(limitTo) {
+        // NOTE: EU region has a different base url: https://eu.api.fpjs.io.
         return fetch(
             `https://api.fpjs.io/visitors/${visitorId}?limit=${limitTo}&token=${SERVER_API_KEY}`
         ).then((response) => {
@@ -39,16 +40,19 @@ export default function App() {
         });
     };
 
+    // Gets 10 most recent visits from server API and stores them to the visitorHistory
+    async function handleGetVisitsHistory() {
+        const history = await getVisits(10);
+        setVisitorHistory(history);
+    }
+
     return (
         <div className="App">
             <header className="App-header">
                 <img src={logo} className="App-logo" alt="logo" />
                 <p>Your visitorId is: {isLoading ? "Loading..." : visitorId}</p>
                 <button
-                    onClick={async () => {
-                        const history = await getVisits(10);
-                        setVisitorHistory(history);
-                    }}
+                    onClick={handleGetVisitsHistory}
                     style={{
                         backgroundColor: "white",
                         padding: "5px 10px",
@@ -62,23 +66,23 @@ export default function App() {
                 >
                     Get Visit History
                 </button>
-                <h3>
-                    {visitorHistory.visits
-                        ? `Received history of ${visitorHistory.visits.length} visits:`
-                        : null}
-                </h3>
-                <pre
-                    style={{
-                        fontFamily: "inherit",
-                        textAlign: "left",
-                        margin: "5%",
-                        fontSize: 14,
-                    }}
-                >
-                    {visitorHistory.visits
-                        ? JSON.stringify(visitorHistory.visits, null, 4)
-                        : null}
-                </pre>
+                {visitorHistory && visitorHistory.visits && (
+                    <>
+                        <h3>
+                            {`Received history of ${visitorHistory.visits.length} visits:`}
+                        </h3>
+                        <pre
+                            style={{
+                                fontFamily: "inherit",
+                                textAlign: "left",
+                                margin: "5%",
+                                fontSize: 14,
+                            }}
+                        >
+                            {JSON.stringify(visitorHistory.visits, null, 4)}
+                        </pre>
+                    </>
+                )}
             </header>
         </div>
     );
