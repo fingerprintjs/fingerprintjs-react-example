@@ -1,5 +1,6 @@
-_## THIS PROJECT IS ARCHIVED AND NOT MAINTAINED ##_
-_### USE THIS INSTEAD: fingerprintjs/fingerprintjs-pro-react ###_
+## 🕸️ THIS PROJECT IS ARCHIVED AND NOT MAINTAINED 🕸️
+
+### 🚙 USE THIS INSTEAD: [fingerprintjs/fingerprintjs-pro-react](https://github.com/fingerprintjs/fingerprintjs-pro-react)
 
 ## Using create-react-app:
 
