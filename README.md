@@ -1,4 +1,5 @@
-# FingerprintJS Pro working in create-react-app
+_## THIS PROJECT IS ARCHIVED AND NOT MAINTAINED ##_
+_### USE THIS INSTEAD: fingerprintjs/fingerprintjs-pro-react ###_
 
 ## Using create-react-app:
 
